@@ -1,43 +1,45 @@
-package com.example.libraryapp
+package com.example.myapplication
 
-import com.example.libraryapp.AddBookActivity
-import android.content.Intent
 import android.os.Bundle
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.libraryapp.model.Book
-import com.example.libraryapp.model.User
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var bookListView: ListView
-    private lateinit var btnAddBook: Button
-    private val bookList = mutableListOf<Book>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        bookListView = findViewById(R.id.bookListView)
-        btnAddBook = findViewById(R.id.btnAddBook)
+        val edtName = findViewById<EditText>(R.id.edtName)
+        val edtAge = findViewById<EditText>(R.id.edtAge)
+        val btnCheck = findViewById<Button>(R.id.btnCheck)
+        val txtResult = findViewById<TextView>(R.id.txtResult)
 
-        // Thêm sách mẫu
-        bookList.add(Book("B001", "Lập trình Kotlin", "Nguyễn Văn A"))
-        bookList.add(Book("B002", "Học Android Studio", "Trần Văn B"))
-        bookList.add(Book("B003", "Cấu trúc dữ liệu & Giải thuật", "Lê Thị C"))
+        btnCheck.setOnClickListener {
+            val name = edtName.text.toString().trim()
+            val ageText = edtAge.text.toString().trim()
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, bookList.map { it.title })
-        bookListView.adapter = adapter
+            if (name.isEmpty() || ageText.isEmpty()) {
+                txtResult.text = "Vui lòng nhập đầy đủ thông tin!"
+                return@setOnClickListener
+            }
 
-        // Sự kiện khi nhấn vào sách
-        bookListView.setOnItemClickListener { _, _, position, _ ->
-            val selectedBook = bookList[position]
-            Toast.makeText(this, "Bạn chọn: ${selectedBook.title}", Toast.LENGTH_SHORT).show()
-        }
+            val age = ageText.toIntOrNull()
+            if (age == null || age < 0) {
+                txtResult.text = "Tuổi không hợp lệ!"
+                return@setOnClickListener
+            }
 
-        // Chuyển sang màn hình thêm sách
-        btnAddBook.setOnClickListener {
-            val intent = Intent(this, AddBookActivity::class.java)
-            startActivity(intent)
+            val category = when {
+                age > 65 -> "Người già"
+                age in 6..65 -> "Người lớn"
+                age in 2..5 -> "Trẻ em"
+                else -> "Em bé"
+            }
+
+            txtResult.text = "$name thuộc nhóm: $category"
         }
     }
 }
+
